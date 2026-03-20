@@ -1,0 +1,23 @@
+{
+  "name": "capstone-design",
+  "version": "1.0.0",
+  "description": "2026 Capstone Design",
+  "homepage": "https://github.com/xhitee/Capstone-Design#readme",
+  "bugs": {
+    "url": "https://github.com/xhitee/Capstone-Design/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xhitee/Capstone-Design.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
