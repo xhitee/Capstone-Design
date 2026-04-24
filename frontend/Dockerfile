@@ -1,0 +1,9 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --legacy-peer-deps
+COPY . .
+EXPOSE 3000
+ENV CI=false
+ENV CHOKIDAR_USEPOLLING=true
+CMD ["npm", "start"]

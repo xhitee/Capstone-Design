@@ -1,0 +1,67 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: capstone_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ai-service:
+    build: ./ai-service
+    container_name: capstone_ai
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - REPLICATE_API_TOKEN=${REPLICATE_API_TOKEN}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    build: ./backend
+    container_name: capstone_backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - AI_SERVICE_URL=http://ai-service:8000
+      - SEED=${SEED:-true}
+      - USE_MOCK=${USE_MOCK:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+      ai-service:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: capstone_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
